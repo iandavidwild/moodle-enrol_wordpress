@@ -203,12 +203,18 @@ class enrol_wordpress_plugin extends enrol_plugin {
                         $this->enrol_wordpress($instance, $data);
                     }
                 }
-                ob_start();
-                $form->display();
-                $output = ob_get_clean();
-                return $OUTPUT->box($output);
             } else {
                 $this->enrol_wordpress($instance);
+                
+                $data = new stdClass();
+                $data->header = $this->get_instance_name($instance);
+                $data->info = $enrolstatus;
+                
+                // The can_self_enrol call returns a button to the login page if the user is a
+                // guest, setting the login url to the form if that is the case.
+                $url = isguestuser() ? get_login_url() : null;
+                $form = new enrol_wordpress_empty_form($url, $data);
+                
             }
         } else {
             // This user can not wordpress enrol using this instance. Using an empty form to keep
@@ -222,11 +228,11 @@ class enrol_wordpress_plugin extends enrol_plugin {
             $url = isguestuser() ? get_login_url() : null;
             $form = new enrol_wordpress_empty_form($url, $data);
             
-            ob_start();
-            $form->display();
-            $output = ob_get_clean();
-            return $OUTPUT->box($output);
         }
+        ob_start();
+        $form->display();
+        $output = ob_get_clean();
+        return $OUTPUT->box($output);
     }
 
     /**
