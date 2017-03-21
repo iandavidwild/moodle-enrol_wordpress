@@ -193,13 +193,22 @@ class enrol_wordpress_plugin extends enrol_plugin {
         $enrolstatus = $this->can_wordpress_enrol($instance);
 
         if (true === $enrolstatus) {
-            // This user can wordpress enrol using this instance.
-            $form = new enrol_wordpress_enrol_form(null, $instance);
-            $instanceid = optional_param('instance', 0, PARAM_INT);
-            if ($instance->id == $instanceid) {
-                if ($data = $form->get_data()) {
-                    $this->enrol_wordpress($instance, $data);
+            // only display the enrolment form if we need to - i.e. if there is an enrolment key to be specified
+            if ($instance->password) {
+                // This user can wordpress enrol using this instance.
+                $form = new enrol_wordpress_enrol_form(null, $instance);
+                $instanceid = optional_param('instance', 0, PARAM_INT);
+                if ($instance->id == $instanceid) {
+                    if ($data = $form->get_data()) {
+                        $this->enrol_wordpress($instance, $data);
+                    }
                 }
+                ob_start();
+                $form->display();
+                $output = ob_get_clean();
+                return $OUTPUT->box($output);
+            } else {
+                $this->enrol_wordpress($instance);
             }
         } else {
             // This user can not wordpress enrol using this instance. Using an empty form to keep
@@ -212,12 +221,12 @@ class enrol_wordpress_plugin extends enrol_plugin {
             // guest, setting the login url to the form if that is the case.
             $url = isguestuser() ? get_login_url() : null;
             $form = new enrol_wordpress_empty_form($url, $data);
+            
+            ob_start();
+            $form->display();
+            $output = ob_get_clean();
+            return $OUTPUT->box($output);
         }
-
-        ob_start();
-        $form->display();
-        $output = ob_get_clean();
-        return $OUTPUT->box($output);
     }
 
     /**
@@ -281,6 +290,12 @@ class enrol_wordpress_plugin extends enrol_plugin {
                 }
                 $a = format_string($cohort->name, true, array('context' => context::instance_by_id($cohort->contextid)));
                 return markdown_to_html(get_string('cohortnonmemberinfo', 'enrol_wordpress', $a));
+            }
+        }
+        
+        if ($userauth = $DB->get_record('user', array('id' => $USER->id), 'auth')) {
+            if($userauth->auth !== 'wordpress') {
+                return get_string('canntenrol', 'enrol_wordpress');
             }
         }
 
