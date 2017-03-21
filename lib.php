@@ -210,10 +210,7 @@ class enrol_wordpress_plugin extends enrol_plugin {
                 $data->header = $this->get_instance_name($instance);
                 $data->info = $enrolstatus;
                 
-                // The can_self_enrol call returns a button to the login page if the user is a
-                // guest, setting the login url to the form if that is the case.
-                $url = isguestuser() ? get_login_url() : null;
-                $form = new enrol_wordpress_empty_form($url, $data);
+                $form = new enrol_wordpress_empty_form(null, $data);
                 
             }
         } else {
