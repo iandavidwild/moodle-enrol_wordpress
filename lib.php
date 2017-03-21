@@ -760,7 +760,7 @@ class enrol_wordpress_plugin extends enrol_plugin {
 
         $options = $this->get_newenrols_options();
         $mform->addElement('select', 'customint6', get_string('newenrols', 'enrol_wordpress'), $options);
-        $mform->addHelpButton('customint6', 'newenrols', 'enrol_wordpres');
+        $mform->addHelpButton('customint6', 'newenrols', 'enrol_wordpress');
         $mform->disabledIf('customint6', 'status', 'eq', ENROL_INSTANCE_DISABLED);
 
         $passattribs = array('size' => '20', 'maxlength' => '50');
